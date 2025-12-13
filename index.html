@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QEI-FAB | Sovereign Semiconductor & Autonomic Control</title>
+  <meta name="description" content="QEI-FAB — Sovereign semiconductor masterplan and deterministic autonomic control layer. Public-safe overview." />
+
+  <style>
+    :root{
+      --bg0:#05060b;
+      --bg1:#0a0d16;
+      --bg2:#0f1629;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.08);
+      --border:rgba(255,255,255,.10);
+      --text:#f6f7fb;
+      --muted:rgba(246,247,251,.70);
+      --muted2:rgba(246,247,251,.55);
+
+      /* “Tech-grade” accent (not copying any brand) */
+      --accent:#31e89b;
+      --accent2:#3aa9ff;
+      --warn:#ffb020;
+
+      --shadow: 0 24px 80px rgba(0,0,0,.55);
+      --shadow2: 0 14px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 26px;
+
+      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Arial, sans-serif;
+      --font-ar: "Tahoma", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+      --max: 1180px;
+    }
+
+    *{box-sizing:border-box; margin:0; padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% -10%, rgba(49,232,155,.16), transparent 60%),
+        radial-gradient(1000px 600px at 90% 10%, rgba(58,169,255,.14), transparent 60%),
+        radial-gradient(900px 600px at 50% 120%, rgba(255,176,32,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg0));
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    a{color:inherit; text-decoration:none}
+    .container{max-width:var(--max); margin:0 auto; padding:0 18px}
+    .noise{
+      position:fixed; inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.65'/%3E%3C/svg%3E");
+      mix-blend-mode:overlay;
+    }
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(5,6,11,.78), rgba(5,6,11,.55));
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+      gap:14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width: 220px;
+    }
+    .mark{
+      width:38px; height:38px; border-radius:999px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.95), rgba(49,232,155,.95) 55%, rgba(10,13,22,1) 100%);
+      box-shadow: 0 12px 30px rgba(49,232,155,.18);
+      display:grid; place-items:center;
+      color:#07110b;
+      font-weight:900;
+      letter-spacing:.08em;
+    }
+    .brand h1{
+      font-size:13px; letter-spacing:.18em; text-transform:uppercase;
+      line-height:1.1;
+    }
+    .brand small{display:block; font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:none}
+    .navlinks{
+      display:flex; align-items:center; gap:18px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .navlinks a{
+      font-size:13px;
+      color:var(--muted);
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid transparent;
+      transition: .2s ease;
+    }
+    .navlinks a:hover{
+      color:var(--text);
+      border-color: rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+    }
+    .navcta{
+      display:flex; align-items:center; gap:10px;
+      margin-left:10px;
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      font-size:13px;
+      cursor:pointer;
+      transition:.2s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.18)}
+    .btn.primary{
+      border-color: rgba(49,232,155,.35);
+      background: linear-gradient(135deg, rgba(49,232,155,.22), rgba(58,169,255,.12));
+      box-shadow: 0 18px 40px rgba(49,232,155,.12);
+    }
+    .btn.primary:hover{box-shadow: 0 22px 55px rgba(49,232,155,.18)}
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      font-size:11px;
+      color:var(--muted);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(49,232,155,.16);
+    }
+
+    /* Hero */
+    .hero{
+      padding:40px 0 24px;
+      position:relative;
+    }
+    .heroGrid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:26px;
+      align-items:stretch;
+    }
+    .heroLeft{
+      border-radius: var(--radius2);
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(900px 500px at 30% 20%, rgba(49,232,155,.14), transparent 60%),
+        radial-gradient(700px 400px at 90% 10%, rgba(58,169,255,.12), transparent 60%),
+        rgba(255,255,255,.03);
+      box-shadow: var(--shadow);
+      padding:26px;
+      overflow:hidden;
+      position:relative;
+    }
+    .heroLeft:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        linear-gradient(90deg, rgba(49,232,155,.0), rgba(49,232,155,.18), rgba(58,169,255,.16), rgba(49,232,155,0));
+      opacity:.35;
+      filter: blur(22px);
+      transform: translateY(-70%);
+    }
+    .heroTitle{
+      font-size: clamp(30px, 4vw, 46px);
+      font-weight:900;
+      line-height:1.06;
+      letter-spacing:-.02em;
+      margin:14px 0 12px;
+    }
+    .heroTitle span{
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .heroSub{
+      color:var(--muted);
+      max-width: 58ch;
+      font-size:14px;
+      line-height:1.7;
+      margin-bottom:16px;
+    }
+    .heroSubAr{
+      direction:rtl;
+      text-align:right;
+      font-family: var(--font-ar);
+      color:var(--muted);
+      font-size:13.5px;
+      line-height:1.9;
+      max-width: 62ch;
+      margin-bottom:18px;
+    }
+    .heroActions{
+      display:flex; flex-wrap:wrap; gap:12px;
+      margin: 14px 0 18px;
+    }
+
+    /* Quick metrics */
+    .metrics{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:12px;
+      margin-top:12px;
+    }
+    .metric{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      border-radius: 16px;
+      padding:12px 12px 10px;
+    }
+    .metric b{display:block; font-size:13px; letter-spacing:.02em}
+    .metric small{display:block; color:var(--muted); font-size:12px; margin-top:6px}
+    .metric .k{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+    }
+    .chiplet{
+      display:inline-flex; align-items:center; gap:8px;
+      font-size:11px;
+      color: rgba(49,232,155,.95);
+      letter-spacing:.10em;
+      text-transform:uppercase;
+    }
+    .chiplet i{
+      width:10px; height:10px; border-radius:3px;
+      background: rgba(49,232,155,.85);
+      box-shadow: 0 0 0 4px rgba(49,232,155,.10);
+      display:inline-block;
+    }
+
+    /* Right hero panel */
+    .heroRight{
+      border-radius: var(--radius2);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      box-shadow: var(--shadow2);
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      overflow:hidden;
+      position:relative;
+    }
+    .panelHead{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      padding:8px 10px 0;
+    }
+    .panelHead h3{
+      font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+      color:var(--muted);
+    }
+    .panel{
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(600px 240px at 20% 20%, rgba(49,232,155,.12), transparent 60%),
+        rgba(0,0,0,.22);
+      padding:14px;
+      min-height: 210px;
+    }
+    .diagram{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .block{
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      padding:10px;
+    }
+    .block small{
+      display:block;
+      color:var(--muted);
+      font-size:10.5px;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+    .block b{font-size:13px}
+    .note{
+      margin-top:10px;
+      color:var(--muted2);
+      font-size:12px;
+      line-height:1.6;
+    }
+    .guard{
+      display:flex; align-items:flex-start; gap:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,176,32,.06);
+      border-radius: 16px;
+      padding:12px;
+      margin-top:12px;
+    }
+    .guard .badge2{
+      width:34px; height:34px; border-radius:12px;
+      display:grid; place-items:center;
+      background: rgba(255,176,32,.14);
+      border:1px solid rgba(255,176,32,.26);
+      color: rgba(255,214,140,.95);
+      font-weight:900;
+    }
+    .guard p{color:var(--muted); font-size:12.5px; line-height:1.7}
+    .guard p b{color:var(--text)}
+
+    /* Section base */
+    section{padding:18px 0}
+    .sectionCard{
+      border-radius: var(--radius2);
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      box-shadow: var(--shadow2);
+      padding:22px;
+    }
+    .sectionTop{
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:16px;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+    .sectionTop h2{
+      font-size:18px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .sectionTop p{
+      color:var(--muted);
+      font-size:13px;
+      max-width: 70ch;
+    }
+    .sectionTop .ar{
+      direction:rtl;
+      text-align:right;
+      font-family: var(--font-ar);
+      color:var(--muted);
+      font-size:13px;
+      max-width: 72ch;
+    }
+
+    /* Feature grid */
+    .grid2{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:14px}
+    .grid3{display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:14px}
+    .card{
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(450px 200px at 20% 0%, rgba(49,232,155,.10), transparent 60%);
+      opacity:.65;
+      pointer-events:none;
+    }
+    .card h3{font-size:14px; margin-bottom:6px}
+    .card p{color:var(--muted); font-size:13px; line-height:1.7}
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size:11px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    .tag .s{
+      width:7px; height:7px; border-radius:999px;
+      background: var(--accent2);
+      box-shadow: 0 0 0 4px rgba(58,169,255,.14);
+      display:inline-block;
+    }
+    .list{margin-top:10px}
+    .list li{
+      list-style:none;
+      color:var(--muted);
+      font-size:12.5px;
+      line-height:1.7;
+      padding-left:14px;
+      position:relative;
+      margin:6px 0;
+    }
+    .list li:before{
+      content:"";
+      width:6px; height:6px;
+      border-radius:2px;
+      position:absolute; left:0; top:.55em;
+      background: rgba(49,232,155,.75);
+      box-shadow: 0 0 0 4px rgba(49,232,155,.10);
+    }
+
+    /* Tabs */
+    .tabs{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:8px;
+    }
+    .tabBtn{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      font-size:12px;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .tabBtn[aria-selected="true"]{
+      color:var(--text);
+      border-color: rgba(49,232,155,.35);
+      background: rgba(49,232,155,.10);
+    }
+    .tabPanel{
+      margin-top:14px;
+      display:none;
+    }
+    .tabPanel.active{display:block}
+
+    /* Disclosure */
+    details{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      border-radius: 16px;
+      padding:12px;
+    }
+    details + details{margin-top:10px}
+    summary{
+      cursor:pointer;
+      list-style:none;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      font-size:13px;
+      color:var(--text);
+      user-select:none;
+    }
+    summary::-webkit-details-marker{display:none}
+    .chev{
+      width:28px; height:28px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      display:grid; place-items:center;
+      color:var(--muted);
+      transition:.2s ease;
+      flex:0 0 auto;
+    }
+    details[open] .chev{transform: rotate(90deg); color:var(--text); border-color: rgba(49,232,155,.25)}
+    details p{margin-top:10px; color:var(--muted); font-size:12.8px; line-height:1.8}
+
+    /* Contact */
+    .contactGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:14px;
+      margin-top:12px;
+    }
+    .info{
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.20);
+      padding:14px;
+    }
+    .info small{
+      display:block;
+      color:var(--muted);
+      font-size:11px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+    .info b{font-size:14px}
+    .copyRow{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      margin-top:10px;
+      padding-top:10px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .miniBtn{
+      padding:8px 10px;
+      font-size:12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color:var(--text);
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .miniBtn:hover{transform: translateY(-1px); border-color: rgba(49,232,155,.30)}
+    .toast{
+      position:fixed; left:50%; bottom:22px;
+      transform: translateX(-50%);
+      padding:10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(5,6,11,.72);
+      backdrop-filter: blur(10px);
+      color: var(--text);
+      font-size:12px;
+      box-shadow: var(--shadow2);
+      display:none;
+      z-index: 80;
+    }
+
+    footer{
+      color: var(--muted2);
+      font-size:11px;
+      padding:26px 0 40px;
+      text-align:center;
+    }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .heroGrid{grid-template-columns: 1fr}
+      .brand{min-width:auto}
+      .metrics{grid-template-columns: 1fr}
+      .grid3{grid-template-columns: 1fr}
+    }
+    @media (max-width: 720px){
+      .grid2{grid-template-columns: 1fr}
+      .contactGrid{grid-template-columns: 1fr}
+      .navlinks{display:none}
+      .heroLeft{padding:20px}
+      .heroRight{padding:14px}
+    }
+
+    /* Subtle motion */
+    @media (prefers-reduced-motion: no-preference){
+      .float{
+        animation: float 7s ease-in-out infinite;
+      }
+      @keyframes float{
+        0%,100%{transform: translateY(0)}
+        50%{transform: translateY(-6px)}
+      }
+      .glowPulse{
+        animation: glow 2.8s ease-in-out infinite;
+      }
+      @keyframes glow{
+        0%,100%{filter: drop-shadow(0 0 0 rgba(49,232,155,0))}
+        50%{filter: drop-shadow(0 0 18px rgba(49,232,155,.22))}
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="toast" id="toast">Copied</div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="container">
+      <div class="nav">
+        <div class="brand">
+          <div class="mark glowPulse">Q</div>
+          <div>
+            <h1>QEI-FAB <small>Engineered Intelligence • Public-Safe Overview</small></h1>
+          </div>
+        </div>
+
+        <div class="navlinks" aria-label="Primary">
+          <a href="#overview">Overview</a>
+          <a href="#masterplan">Masterplan</a>
+          <a href="#autonomic">Autonomic Layer</a>
+          <a href="#trust">Governance</a>
+          <a href="#contact">Contact</a>
+        </div>
+
+        <div class="navcta">
+          <span class="pill"><span class="dot"></span>Operating Mode: Public</span>
+          <a class="btn primary" href="#contact">Request Brief</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero" id="overview">
+    <div class="container">
+      <div class="heroGrid">
+        <div class="heroLeft">
+          <span class="pill"><span class="dot"></span>QEI • Sovereign • Deterministic</span>
+
+          <h2 class="heroTitle">
+            A sovereign semiconductor masterplan with <span>deterministic autonomic control</span>.
+          </h2>
+
+          <p class="heroSub">
+            This site is a public-safe overview of QEI-FAB and the Autonomic Layer concept: stability-first control,
+            traceable decisions, and vendor-neutral architecture principles — without exposing sensitive implementation details.
+          </p>
+
+          <p class="heroSubAr">
+            هذا الموقع نسخة “عرض عام” لا تكشف التفاصيل الحساسة. يوضح الفكرة: مخطط تصنيع سيادي + طبقة تحكم ذاتي حتمية
+            تربط التشغيل بالاستقرار والحوكمة والتدقيق.
+          </p>
+
+          <div class="heroActions">
+            <a class="btn primary" href="#masterplan">Explore Masterplan</a>
+            <a class="btn" href="#autonomic">View Autonomic Layer</a>
+            <button class="btn" id="openBrief">Open Public Brief</button>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="k">
+                <b>Compute Independence</b>
+                <span class="chiplet"><i></i>vendor-neutral</span>
+              </div>
+              <small>Architecture treats hardware as a replaceable variable; policy + physics remain invariant.</small>
+            </div>
+            <div class="metric">
+              <div class="k">
+                <b>Deterministic Control</b>
+                <span class="chiplet"><i></i>stability-first</span>
+              </div>
+              <small>Hard safety envelope remains non-negotiable; forecasting never directly actuates critical controls.</small>
+            </div>
+            <div class="metric">
+              <div class="k">
+                <b>Auditable Governance</b>
+                <span class="chiplet"><i></i>traceable</span>
+              </div>
+              <small>Decisions and changes are recorded for governance review and controlled operational assurance.</small>
+            </div>
+          </div>
+        </div>
+
+        <aside class="heroRight">
+          <div class="panelHead">
+            <h3>System Map</h3>
+            <span class="pill"><span class="dot"></span>Layered Runtime</span>
+          </div>
+
+          <div class="panel float">
+            <div class="diagram" aria-label="Autonomic layer blocks">
+              <div class="block">
+                <small>Layer C</small>
+                <b>Stabilizer</b>
+              </div>
+              <div class="block">
+                <small>Layer B</small>
+                <b>Forecaster</b>
+              </div>
+              <div class="block">
+                <small>Layer A</small>
+                <b>Supervisor</b>
+              </div>
+            </div>
+
+            <p class="note">
+              Public-safe framing: deterministic stabilization (C) + probabilistic forecasting (B) governed by a supervisory
+              plane (A) that bounds economic impact and enforces policy constraints.
+            </p>
+
+            <div class="guard">
+              <div class="badge2">E</div>
+              <p>
+                <b>Economic Guard</b> limits the impact of uncertain forecasts via gradual actions, checkpoints, and rollback.
+                Physical safety remains independent and dominant.
+              </p>
+            </div>
+          </div>
+
+          <div class="panelHead">
+            <h3>Public Mode</h3>
+            <span class="pill"><span class="dot"></span>No sensitive details</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <!-- MASTERPLAN -->
+  <section id="masterplan">
+    <div class="container">
+      <div class="sectionCard">
+        <div class="sectionTop">
+          <div>
+            <h2>QEI-FAB Masterplan</h2>
+            <p>Dual-track roadmap: capability bootstrap → advanced sovereignty, with utilities-aware resiliency.</p>
+          </div>
+          <p class="ar">خطة مسارين: تأسيس القدرة + الانتقال التدريجي للعقد المتقدمة ضمن حدود البنية التحتية والحوكمة.</p>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <span class="tag"><span class="s"></span>Pilot Track</span>
+            <h3>Capability bootstrap &amp; talent pipeline</h3>
+            <p>
+              Establish an operational foundation with mature process nodes, training, tooling discipline, and
+              end-to-end MES/SCADA + metrology integration.
+            </p>
+            <ul class="list">
+              <li>Operator / engineer readiness pipeline.</li>
+              <li>Process control playbooks and defect triage discipline.</li>
+              <li>Supply-chain onboarding under controlled risk.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <span class="tag"><span class="s"></span>Advanced Track</span>
+            <h3>High-capex path requires uptime + stability</h3>
+            <p>
+              Advanced node operations demand extreme operational maturity: predictive maintenance, utilities resilience,
+              and governance-grade traceability to protect economic viability.
+            </p>
+            <ul class="list">
+              <li>Uptime protection is the core ROI constraint.</li>
+              <li>Utilities (power / water / cooling) treated as first-class stability inputs.</li>
+              <li>Controlled policy boundaries for sovereign constraints.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="grid3">
+          <div class="card">
+            <span class="tag"><span class="s"></span>Utilities Stability</span>
+            <h3>Infrastructure is part of control</h3>
+            <p>Public-safe view: autonomic layer extends beyond tools into utilities monitoring and stability envelopes.</p>
+          </div>
+          <div class="card">
+            <span class="tag"><span class="s"></span>Risk Boundaries</span>
+            <h3>Sovereign risk is engineered</h3>
+            <p>Export-control, locality, and vendor constraints are implemented as enforceable policy—never as optional tags.</p>
+          </div>
+          <div class="card">
+            <span class="tag"><span class="s"></span>Operational Discipline</span>
+            <h3>Measured, not marketed</h3>
+            <p>KPIs are operational: drift rate, uptime, bounded action compliance, and audit coverage.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTONOMIC -->
+  <section id="autonomic">
+    <div class="container">
+      <div class="sectionCard">
+        <div class="sectionTop">
+          <div>
+            <h2>Autonomic Layer</h2>
+            <p>Deterministic runtime for fab operations: monitor → analyze → plan → execute, with strict policy gates.</p>
+          </div>
+          <p class="ar">طبقة تشغيل ذاتي حتمية: مراقبة ثم تحليل ثم تخطيط ثم تنفيذ، مع بوابات سيادة تمنع أي انحراف.</p>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="Autonomic tabs">
+          <button class="tabBtn" role="tab" aria-selected="true" aria-controls="t1" id="b1">Layer C • Stabilizer</button>
+          <button class="tabBtn" role="tab" aria-selected="false" aria-controls="t2" id="b2">Layer B • Forecaster</button>
+          <button class="tabBtn" role="tab" aria-selected="false" aria-controls="t3" id="b3">Layer A • Supervisor</button>
+          <button class="tabBtn" role="tab" aria-selected="false" aria-controls="t4" id="b4">ECO Guard</button>
+        </div>
+
+        <div id="t1" class="tabPanel active" role="tabpanel" aria-labelledby="b1">
+          <div class="grid2">
+            <div class="card">
+              <span class="tag"><span class="s"></span>Deterministic Safety</span>
+              <h3>Non-negotiable physical envelope</h3>
+              <p>
+                Stabilizer consumes real-time telemetry and enforces immediate protective actions when thresholds are crossed.
+                This path is isolated and does not wait for long-horizon forecasts.
+              </p>
+              <ul class="list">
+                <li>Physics-first constraints are enforced locally and instantly.</li>
+                <li>Hard stop / safe setpoints are deterministic.</li>
+                <li>Designed to remain robust under partial system failures.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="tag"><span class="s"></span>Public-safe outputs</span>
+              <h3>What is shown publicly</h3>
+              <p>
+                Only conceptual control behavior is described here. Sensitive parameters, thresholds, and internal telemetry schemas
+                remain undisclosed.
+              </p>
+              <ul class="list">
+                <li>No equipment-specific tuning disclosed.</li>
+                <li>No operational thresholds published.</li>
+                <li>No proprietary integration details exposed.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div id="t2" class="tabPanel" role="tabpanel" aria-labelledby="b2">
+          <div class="grid2">
+            <div class="card">
+              <span class="tag"><span class="s"></span>Forecasting Plane</span>
+              <h3>Probabilistic insights, not control</h3>
+              <p>
+                Forecasting produces hypotheses about yield and drift trends. Its outputs are always gated and bounded before
+                any operational consequence.
+              </p>
+              <ul class="list">
+                <li>Runs near-line / off-line.</li>
+                <li>Outputs are confidence-scored and reviewed by governance gates.</li>
+                <li>Never writes setpoints directly.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="tag"><span class="s"></span>Interpretability</span>
+              <h3>Operationally readable signals</h3>
+              <p>
+                The system aims to output operational signals that can be audited and compared to historical outcomes, avoiding
+                opaque “trust me” recommendations.
+              </p>
+              <ul class="list">
+                <li>Confidence + consistency scoring.</li>
+                <li>Change justification is logged.</li>
+                <li>Bounded-by-policy action mapping.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div id="t3" class="tabPanel" role="tabpanel" aria-labelledby="b3">
+          <div class="grid2">
+            <div class="card">
+              <span class="tag"><span class="s"></span>Governed Orchestration</span>
+              <h3>Policy gates and routing</h3>
+              <p>
+                Supervisory control merges deterministic safety with probabilistic insights under strict policy constraints,
+                selecting allowed actions and rejecting unsafe paths.
+              </p>
+              <ul class="list">
+                <li>Applies sovereignty constraints and locality boundaries.</li>
+                <li>Ensures any recommendation remains reversible when required.</li>
+                <li>Coordinates escalation modes for stability.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="tag"><span class="s"></span>Audit</span>
+              <h3>Traceability by design</h3>
+              <p>
+                Operational decisions are recorded for governance review. Publicly, we describe the concept only—internal
+                ledger format and keys remain confidential.
+              </p>
+              <ul class="list">
+                <li>Decision provenance.</li>
+                <li>Change history and rollback checkpoints.</li>
+                <li>Compliance-oriented reporting (public-safe).</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div id="t4" class="tabPanel" role="tabpanel" aria-labelledby="b4">
+          <div class="grid2">
+            <div class="card">
+              <span class="tag"><span class="s"></span>Bounded Actions</span>
+              <h3>Gradient + checkpoints + rollback</h3>
+              <p>
+                Economic Guard shapes any optimization proposal into gradual steps with checkpoints, preventing large swings
+                triggered by uncertain forecasts.
+              </p>
+              <ul class="list">
+                <li>No hard stops from probabilistic outputs.</li>
+                <li>Action ramps with rollback points.</li>
+                <li>Impact caps enforced by policy.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <span class="tag"><span class="s"></span>Public-safe assurance</span>
+              <h3>What we disclose</h3>
+              <p>
+                We disclose the safety logic (bounded impact) and separation principles, not the thresholds, weights, or
+                internal scoring formulas.
+              </p>
+              <ul class="list">
+                <li>Separation: safety vs optimization.</li>
+                <li>Bounded-by-policy governance gates.</li>
+                <li>Audit presence without exposing internals.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <details>
+            <summary>
+              Public Disclosure Boundary
+              <span class="chev">›</span>
+            </summary>
+            <p>
+              This page is intentionally constrained: it demonstrates architecture and governance principles while avoiding any
+              sensitive operational parameters, private integrations, or proprietary implementation details.
+            </p>
+          </details>
+
+          <details>
+            <summary>
+              What a private brief can include (upon NDA / controlled channel)
+              <span class="chev">›</span>
+            </summary>
+            <p>
+              A private brief can expand on interfaces, operating envelopes, validation approach, and phased deployment plan under
+              controlled disclosure. Public pages remain principle-level by design.
+            </p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST / GOVERNANCE -->
+  <section id="trust">
+    <div class="container">
+      <div class="sectionCard">
+        <div class="sectionTop">
+          <div>
+            <h2>Governance &amp; Security</h2>
+            <p>Zero-trust posture and audit-first governance principles (public-safe overview).</p>
+          </div>
+          <p class="ar">حوكمة وتدقيق وسياسات سيادة—عرض عام دون تفاصيل حساسة.</p>
+        </div>
+
+        <div class="grid3">
+          <div class="card">
+            <span class="tag"><span class="s"></span>Zero-Trust</span>
+            <h3>Identity &amp; verification</h3>
+            <p>Access and execution require verification; trust is never granted by location alone.</p>
+            <ul class="list">
+              <li>Authenticated control channels.</li>
+              <li>Controlled access boundaries.</li>
+              <li>Operational segregation.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <span class="tag"><span class="s"></span>Policy Priority</span>
+            <h3>Safety and boundaries first</h3>
+            <p>Policy constraints override any optimization. The system refuses unsafe placements or actions.</p>
+            <ul class="list">
+              <li>Non-negotiable safety envelope.</li>
+              <li>Locality and sovereignty rules.</li>
+              <li>Bounded impact guarantees.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <span class="tag"><span class="s"></span>Audit</span>
+            <h3>Traceability</h3>
+            <p>Decision traces exist for review. Public pages disclose existence, not internal structure.</p>
+            <ul class="list">
+              <li>Change provenance.</li>
+              <li>Review checkpoints.</li>
+              <li>Incident-oriented response discipline.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="sectionCard">
+        <div class="sectionTop">
+          <div>
+            <h2>Contact</h2>
+            <p>For strategic review, partnerships, or controlled technical brief.</p>
+          </div>
+          <p class="ar">للتواصل الرسمي وطلب عرض تقني ضمن قنوات مضبوطة.</p>
+        </div>
+
+        <div class="contactGrid">
+          <div class="info">
+            <small>Primary</small>
+            <b>MR AMMAR — QEI Architect</b>
+
+            <div class="copyRow">
+              <span style="color:var(--muted); font-size:12px">Email</span>
+              <button class="miniBtn" data-copy="ammarmdalal@gmail.com">Copy</button>
+            </div>
+            <div style="margin-top:8px; color:var(--text); font-size:13px">
+              ammarmdalal@gmail.com
+            </div>
+          </div>
+
+          <div class="info">
+            <small>Public Site</small>
+            <b>GitHub Pages</b>
+
+            <div class="copyRow">
+              <span style="color:var(--muted); font-size:12px">URL</span>
+              <button class="miniBtn" data-copy="https://ammar20202030.github.io/QEI-AI/">Copy</button>
+            </div>
+            <div style="margin-top:8px; color:var(--text); font-size:13px">
+              <a href="https://ammar20202030.github.io/QEI-AI/" target="_blank" rel="noopener">ammar20202030.github.io/QEI-AI/</a>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="grid2">
+          <div class="card">
+            <span class="tag"><span class="s"></span>Public-safe statement</span>
+            <h3>Disclosure discipline</h3>
+            <p>
+              This site is designed to be publishable: concept, architecture, governance principles.
+              Sensitive thresholds, internal tooling, private roadmaps, and confidential integrations are not exposed.
+            </p>
+          </div>
+          <div class="card">
+            <span class="tag"><span class="s"></span>Collaboration</span>
+            <h3>How to engage</h3>
+            <p>
+              Use email for initial contact. For deep technical discussion, use controlled channel and staged disclosure.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        © <span id="year"></span> QEI-FAB • Engineered Intelligence • Public-Safe Overview
+      </footer>
+    </div>
+  </section>
+
+  <script>
+    // Year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Tabs
+    const buttons = Array.from(document.querySelectorAll(".tabBtn"));
+    const panels = Array.from(document.querySelectorAll(".tabPanel"));
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.setAttribute("aria-selected", "false"));
+        panels.forEach(p => p.classList.remove("active"));
+        btn.setAttribute("aria-selected", "true");
+        const id = btn.getAttribute("aria-controls");
+        document.getElementById(id).classList.add("active");
+      });
+    });
+
+    // Copy helpers
+    const toast = document.getElementById("toast");
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.style.display = "block";
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(()=> toast.style.display = "none", 1400);
+    }
+    document.querySelectorAll("[data-copy]").forEach(el => {
+      el.addEventListener("click", async () => {
+        const txt = el.getAttribute("data-copy");
+        try{
+          await navigator.clipboard.writeText(txt);
+          showToast("Copied");
+        }catch(e){
+          // fallback
+          const ta = document.createElement("textarea");
+          ta.value = txt;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+          showToast("Copied");
+        }
+      });
+    });
+
+    // Public brief modal (simple)
+    const briefText =
+`PUBLIC BRIEF (SAFE):
+- QEI-FAB: sovereign semiconductor masterplan concept.
+- Autonomic Layer: deterministic stabilization + governed forecasting.
+- Governance: zero-trust posture + audit-first discipline.
+- Disclosure: principles only. No sensitive parameters or internal implementation.`;
+    document.getElementById("openBrief").addEventListener("click", () => {
+      alert(briefText);
+    });
+  </script>
+</body>
+</html>
